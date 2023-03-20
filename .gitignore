@@ -11,3 +11,6 @@
 *.mp3
 *.pdf
 *.tar.gz
+
+
+.vscode

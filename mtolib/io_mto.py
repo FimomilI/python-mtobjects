@@ -45,7 +45,7 @@ def read_fits_file(filename):
         hdulist.close()
 
         if img_data.dtype != np.double:
-            img_data = img_data.astype(np.float)
+            img_data = img_data.astype(float)
 
         return img_data
 
@@ -154,7 +154,8 @@ def generate_parameters(img, object_ids, sig_ancs, p):
 def make_parser():
     """Create an argument parser for MTObjects."""
     parser = argparse.ArgumentParser(description='Find objects in a fits file')
-    parser.add_argument('filename', type=str, help='Location of input .fits file')
+    # parser.add_argument('filename', type=str, help='Location of input .fits file')
+    parser.add_argument('-filename', type=str, help='Location of input .fits file', default='../../data/test.fits')
     parser.add_argument('-out', type=str, help='Location to save filtered image. '
                                                'Supports .fits and .png filenames', default='out.png')
     parser.add_argument('-par_out', type=str, help='Location to save output parameters (csv format).', default='parameters.csv')
@@ -166,6 +167,6 @@ def make_parser():
     parser.add_argument('-move_factor', type=utils.validate_positive, help='Moves up the object marker', default=0.5)
     parser.add_argument('-min_distance', type=utils.validate_positive,
                          help='Minimum brightness distance between objects', default=0.0)
-    parser.add_argument('-verbosity', type=int, help='Verbosity level (0-2)', choices=range(0, 3), default=0)
+    parser.add_argument('-verbosity', type=int, help='Verbosity level (0-2)', choices=range(0, 3), default=2)
 
     return parser
