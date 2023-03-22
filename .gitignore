@@ -12,5 +12,8 @@
 *.pdf
 *.tar.gz
 
-
+# IDE
 .vscode
+
+# profiling
+profile.*

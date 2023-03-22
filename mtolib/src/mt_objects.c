@@ -393,7 +393,7 @@ void mt_objects_init(mt_object_data *mt_o)
 }
 
 
-// The main method for object detection
+// NOTE: The main method for object detection
 void mt_objects(mt_object_data* mt_o)
 {
   // Create arrays

@@ -45,7 +45,7 @@ def read_fits_file(filename):
         hdulist.close()
 
         if img_data.dtype != np.double:
-            img_data = img_data.astype(float)
+            img_data = img_data.astype(np.single)
 
         return img_data
 
@@ -155,7 +155,8 @@ def make_parser():
     """Create an argument parser for MTObjects."""
     parser = argparse.ArgumentParser(description='Find objects in a fits file')
     # parser.add_argument('filename', type=str, help='Location of input .fits file')
-    parser.add_argument('-filename', type=str, help='Location of input .fits file', default='../../data/test.fits')
+    parser.add_argument('-filename', type=str, help='Location of input .fits file', default='../../data/test.fits')  # NOTE: 2D
+    # parser.add_argument('-filename', type=str, help='Location of input .fits file', default='../../data/test3D.fit')  # NOTE: 3D does not work without modifications
     parser.add_argument('-out', type=str, help='Location to save filtered image. '
                                                'Supports .fits and .png filenames', default='out.png')
     parser.add_argument('-par_out', type=str, help='Location to save output parameters (csv format).', default='parameters.csv')

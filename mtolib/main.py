@@ -24,7 +24,7 @@ def setup():
 
     img = read_fits_file(p.filename)
 
-    if p.verbosity:
+    if p.verbosity:  # NOTE: expects 2D image, not 3D cube.
         print("\n---Image dimensions---")
         print("Height = ", img.shape[0])
         print("Width = ", img.shape[1])
@@ -47,7 +47,7 @@ def max_tree_timed(img, params, maxtree_class):
     if params.verbosity:
         print("\n---Building Maxtree---")
     mt = maxtree_class(img, params.verbosity, params)
-    mt.flood()
+    mt.flood()  # NOTE: does this just mean find all connected pixels/voxels that have the same gray-level?
     return mt
 
 

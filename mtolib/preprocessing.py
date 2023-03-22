@@ -29,7 +29,7 @@ def estimate_background(img, p):
 
     if p.bg_mean is None or p.bg_variance < 0:
 
-        if np.isnan(img).any():
+        if np.isnan(img).any():  # TODO: also warn about saturated pixels/voxels?
             if p.verbosity > 0:
                 print("WARNING: image contains NAN values which may affect output parameters")
 
@@ -57,7 +57,8 @@ def estimate_gain(img, p):
 
     # Negative gains break sig test 4 - estimated gain should be positive
     if p.gain < 0:
-        image_minimum = np.nanmin(img)
+        image_minimum = np.nanmin(img)  # NOTE: what does it mean for this to be VERY negative?
+        # image_minimum = 5  # NOTE: just a random low number that feels more sensible?
         if image_minimum < 0:
             p.soft_bias = image_minimum
 

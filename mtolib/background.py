@@ -68,11 +68,11 @@ def largest_flat_tile(img, sig_level, tile_size_start=6, tile_size_min=4, tile_s
 def available_tiles(img, tile_length, sig_level):
     """Check if at least one background tile is available at this scale"""
 
-    # Iterate over tiles
+    # Iterate over tiles # NOTE: this is also only 2D?
     for y in range(0, img.shape[0] - tile_length, tile_length):
         for x in range(0,img.shape[1]-tile_length, tile_length):
             # Test each tile for flatness
-            if check_tile_is_flat(img[y:y+tile_length,x:x+tile_length], sig_level):
+            if check_tile_is_flat(img[y:y+tile_length,x:x+tile_length]):
                 return True
     return False
 
@@ -85,7 +85,7 @@ def collect_info(img, tile_length, rejection_rate, verbosity=1):
     for y in range(0, img.shape[0]-tile_length, tile_length):
         for x in range(0,img.shape[1]-tile_length, tile_length):
             # Test each tile for flatness
-            if check_tile_is_flat(img[y:y+tile_length, x:x+tile_length], rejection_rate):
+            if check_tile_is_flat(img[y:y+tile_length, x:x+tile_length]):
                 # If flat, add to list
                 flat_tiles.append([x,y])
 
@@ -96,7 +96,7 @@ def collect_info(img, tile_length, rejection_rate, verbosity=1):
     return est_mean_and_variance(img, tile_length, flat_tiles)
 
 
-def check_tile_is_flat(tile, rejection_rate):
+def check_tile_is_flat(tile):
     """Test if tile is flat - check normality and equal means"""
 
     # Discard tiles which are entirely zeros
@@ -120,6 +120,7 @@ def check_tile_is_flat(tile, rejection_rate):
     return _ACCEPT_TILE
 
 
+# NOTE: only for 2D?
 def check_tile_means(tile, sig_level):
     """Check if tile halves have equal means"""
 
@@ -138,9 +139,10 @@ def check_tile_means(tile, sig_level):
     return _ACCEPT_TILE
 
 
+# NOTE: can this test be used in this (collapsing 2D to 1D) way? Is it not an EDF based test?
 def test_normality(array, test_statistic):
     """Test the hypothesis that the values in an array come from a normal distribution"""
-    k2, p = stats.normaltest(array.ravel(), nan_policy='omit')
+    _, p = stats.normaltest(array.ravel(), nan_policy='omit')
 
     # If p < test_statistic -> reject null hypothesis -> values are not from a normal distribution
     if p < test_statistic:
