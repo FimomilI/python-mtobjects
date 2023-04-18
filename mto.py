@@ -11,6 +11,11 @@ processed_image = mto.preprocess_image(image, params, n=2)
 # Build a max tree
 mt = mto.build_max_tree(processed_image, params)
 
+# NOTE: the max-tree is probably this mt.mt.nodes?
+# for i in [j*1000 for j in range(200)]:
+#     print(mt.mt.nodes[i].area)
+# exit()
+
 # Filter the tree and find objects
 id_map, sig_ancs = mto.filter_tree(mt, processed_image, params)
 

@@ -26,13 +26,16 @@ void mt_stack_resize(mt_stack* stack)
 
 void mt_stack_insert(mt_stack* stack, const mt_pixel* pixel)
 {
+  // NOTE: resize when overflowing?
   if (stack->max_entries == stack->num_entries)
   {
     mt_stack_resize(stack);
   }
   
+  // just set the next entry
   stack->entries[stack->num_entries] = *pixel;
   
+  // NOTE: this reads as ++(stack->num_entries) due to operator precedence for pointer dereferencing. WHY do you set a new empty entry after putting an entry on the stack? could have just had this line of code at the top of the function and instead index to "[stack->num_entries + 1]"?
   ++stack->num_entries;
 }
 
