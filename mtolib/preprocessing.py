@@ -10,10 +10,12 @@ from mtolib import background, utils
 def preprocess_image(img, p, gaussian_blur=True, n=2, nan_value=np.inf):
     """Estimate an image's background, subtract it, smooth and truncate."""
 
-    # Estimate and subtract the background
-    estimate_background(img, p)
-    new_img = subtract_background(img, p.bg_mean)
-
+    # NOTE: this background estimation does not work in 3D because a tile (or cube in 3D) is not valid for any wavelength, but only at the wavelength it is found. Thus only local, whereas spatially it is fine to define a background tile anywhere suitable in th image and apply subtraction to the whole image.
+    # # Estimate and subtract the background
+    # estimate_background(img, p)
+    # new_img = subtract_background(img, p.bg_mean)
+    new_img = img
+    
     # Smooth the image
     if gaussian_blur:
         new_img = smooth_image(new_img, n)

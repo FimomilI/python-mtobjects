@@ -6,7 +6,7 @@ import mtolib.main as mto
 image, params = mto.setup()
 
 # Pre-process the image
-processed_image = mto.preprocess_image(image, params, n=2)
+processed_image = mto.preprocess_image(image, params, n=3)
 
 # Build a max tree
 mt = mto.build_max_tree(processed_image, params)

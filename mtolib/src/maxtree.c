@@ -28,6 +28,20 @@ const int mt_conn_4[MT_CONN_4_HEIGHT * MT_CONN_4_WIDTH] =
   0, 1, 0,
 };
 
+const int mt_conn_6[3 * 3 * 3] =
+{
+  {{0, 0, 0},
+   {0, 1, 0},
+   {0, 0, 0}},
+  {{0, 1, 0},
+   {1, 0, 1},
+   {0, 1, 0}},
+  {{0, 0, 0},
+   {0, 1, 0},
+   {0, 0, 0}}
+};
+
+
 mt_pixel mt_starting_pixel(mt_data* mt)
 {
   // Find the minimum pixel value in the image

@@ -33,16 +33,18 @@ typedef struct
   PIXEL_TYPE* data;
   SHORT_TYPE height;
   SHORT_TYPE width;
+  SHORT_TYPE depth;
   INT_TYPE size;
 } image;
 
 static inline void image_set(image* img, PIXEL_TYPE *data,
-  SHORT_TYPE height, SHORT_TYPE width)
+  SHORT_TYPE height, SHORT_TYPE width, SHORT_TYPE depth)
 {
   img->data = data;
   img->height = height;
   img->width = width;
-  img->size = height * width;
+  img->depth = depth;
+  img->size = height * width * depth;
 }
 
 static inline void image_free(image* img)
