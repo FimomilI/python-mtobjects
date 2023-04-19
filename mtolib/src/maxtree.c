@@ -2,8 +2,8 @@
 
 #include <assert.h>
 
-#define MT_INDEX_OF(PIXEL) ((PIXEL).location.y * mt->img.width + \
-  (PIXEL).location.x)
+#define MT_INDEX_OF(PIXEL) (((PIXEL).location.depth * mt->img.depth) + \
+((PIXEL).location.y * mt->img.width) + (PIXEL).location.x)
 
 const int mt_conn_12[MT_CONN_12_HEIGHT * MT_CONN_12_WIDTH] =
 {
@@ -28,7 +28,7 @@ const int mt_conn_4[MT_CONN_4_HEIGHT * MT_CONN_4_WIDTH] =
   0, 1, 0,
 };
 
-const int mt_conn_6[3 * 3 * 3] =
+const int mt_conn_6[MT_CONN_6_DEPTH * MT_CONN_6_HEIGHT * MT_CONN_6_WIDTH] =
 {
   0, 0, 0,
   0, 1, 0,
@@ -37,7 +37,7 @@ const int mt_conn_6[3 * 3 * 3] =
   0, 1, 0,
   1, 0, 1,
   0, 1, 0,
-  
+
   0, 0, 0,
   0, 1, 0,
   0, 0, 0
@@ -49,29 +49,34 @@ mt_pixel mt_starting_pixel(mt_data* mt)
   // Find the minimum pixel value in the image
   SHORT_TYPE y;
   SHORT_TYPE x;
+  SHORT_TYPE depth;
 
   mt_pixel pixel;
   pixel.location.x = 0;
   pixel.location.y = 0;
+  pixel.location.depth = 0;
 
   pixel.value = mt->img.data[0];
 
   // iterate over image pixels
-  for (y = 0; y != mt->img.height; ++y)
+  for (depth = 0; depth != mt->img.depth; ++depth)
   {
-    for (x = 0; x != mt->img.width; ++x)
+    for (y = 0; y != mt->img.height; ++y)
     {
-	  // Convert from x,y coordinates to an array index
-    // NOTE: because it is just a 1D array now?
-      INT_TYPE index = y * mt->img.width + x;
-
-      // If the pixel is less than the current minimum, update the minimum
-      if (mt->img.data[index] < pixel.value)
+      for (x = 0; x != mt->img.width; ++x)
       {
-        pixel.value = mt->img.data[index];
-        pixel.location.x = x;
-        pixel.location.y = y;
+      // Convert from x,y coordinates to an array index
+      // NOTE: because it is a 1D array? I don't really get how this iterates over all indices?
+        INT_TYPE index = (depth * mt->img.depth) + (y * mt->img.width) + x;
 
+        // If the pixel is less than the current minimum, update the minimum
+        if (mt->img.data[index] < pixel.value)
+        {
+          pixel.value = mt->img.data[index];
+          pixel.location.x = x;
+          pixel.location.y = y;
+          pixel.location.depth = depth;
+        }
       }
     }
   }
@@ -93,7 +98,7 @@ static void mt_init_nodes(mt_data* mt)
 }
 
 static int mt_queue_neighbour(mt_data* mt, PIXEL_TYPE val,
-  SHORT_TYPE x, SHORT_TYPE y)
+  SHORT_TYPE x, SHORT_TYPE y, SHORT_TYPE depth)
 {
   // Add a pixel to the queue for processing
 
@@ -101,8 +106,9 @@ static int mt_queue_neighbour(mt_data* mt, PIXEL_TYPE val,
   mt_pixel neighbour;
   neighbour.location.x = x;
   neighbour.location.y = y;
+  neighbour.location.depth = depth;
 
-  // Convert from x,y coordinates to an array index
+  // Convert from x,y,depth coordinates to an array index
   INT_TYPE neighbour_index = MT_INDEX_OF(neighbour);
   // Get a pointer to the neighbour
   mt_node *neighbour_node = mt->nodes + neighbour_index;
@@ -135,6 +141,7 @@ static void mt_queue_neighbours(mt_data* mt,
   // Radius is half size of connectivity
   INT_TYPE radius_y = mt->connectivity.height / 2;
   INT_TYPE radius_x = mt->connectivity.width / 2;
+  INT_TYPE radius_depth = mt->connectivity.depth / 2;
 
   // If pixel's x is less than radius, conn = the difference
   INT_TYPE conn_x_min = 0;
@@ -145,6 +152,11 @@ static void mt_queue_neighbours(mt_data* mt,
   INT_TYPE conn_y_min = 0;
   if (pixel->location.y < radius_y)
     conn_y_min = radius_y - pixel->location.y;
+  
+  // Ditto for depth
+  INT_TYPE conn_depth_min = 0;
+  if (pixel->location.depth < radius_depth)
+    conn_depth_min = radius_depth - pixel->location.depth;
 
   // NOTE: avoid going outside image bounds (so basically accounting for edge effects?)
   // If pixel's x + radius > image width, conn = radius + width - location - 1
@@ -155,30 +167,40 @@ static void mt_queue_neighbours(mt_data* mt,
   INT_TYPE conn_y_max = 2 * radius_y;
   if (pixel->location.y + radius_y >= mt->img.height)
     conn_y_max = radius_y + mt->img.height - pixel->location.y - 1;
+  
+  INT_TYPE conn_depth_max = 2 * radius_depth;
+  if (pixel->location.depth + radius_depth >= mt->img.depth)
+    conn_depth_max = radius_depth + mt->img.depth - pixel->location.depth - 1;
 
-  INT_TYPE conn_y;
   // Conn coordinates refer to position with connectivity grid
   // NOTE: check within the connectivity region
-  for (conn_y = conn_y_min; conn_y <= conn_y_max; ++conn_y)
+  INT_TYPE conn_depth;
+  for (conn_depth = conn_depth_min; conn_depth <= conn_depth_max; ++conn_depth)
   {
-    INT_TYPE conn_x;
-    for (conn_x = conn_x_min; conn_x <= conn_x_max; ++conn_x)
+    INT_TYPE conn_y;
+    for (conn_y = conn_y_min; conn_y <= conn_y_max; ++conn_y)
     {
-	  // Skip iteration if 0 in connectivity grid
-      if (mt->connectivity.
-        neighbors[conn_y * mt->connectivity.width + conn_x] == 0)
+      INT_TYPE conn_x;
+      for (conn_x = conn_x_min; conn_x <= conn_x_max; ++conn_x)
       {
-        continue;
-      }
+      // Skip iteration if 0 in connectivity grid
+        if (mt->connectivity.
+          neighbors[(conn_depth * mt->connectivity.depth) + \
+          (conn_y * mt->connectivity.width) + conn_x] == 0)
+        {
+          continue;
+        }
 
-      // Try to queue neighbour at x = x-rad+conn
-      // If successfully queued and value higher than current,
-      // break out of function
-      if (mt_queue_neighbour(mt, pixel->value,
-        pixel->location.x - radius_x + conn_x,
-        pixel->location.y - radius_y + conn_y))
-      {
-        return;
+        // Try to queue neighbour at x = x-rad+conn
+        // If successfully queued and value higher than current,
+        // break out of function
+        if (mt_queue_neighbour(mt, pixel->value,
+          pixel->location.x - radius_x + conn_x,
+          pixel->location.y - radius_y + conn_y,
+          pixel->location.depth - radius_depth + conn_depth))
+        {
+          return;
+        }
       }
     }
   }
@@ -262,19 +284,26 @@ void mt_flood(mt_data* mt)
   assert(mt->connectivity.height % 2 == 1);
   assert(mt->connectivity.width > 0);
   assert(mt->connectivity.width % 2 == 1);
+  assert(mt->connectivity.depth > 0);
+  assert(mt->connectivity.depth % 2 == 1);
 
   if (mt->verbosity_level)
   {
     int num_neighbors = 0;
     int i;
-    for (i = 0; i != mt->connectivity.height; ++i)
+    for (i = 0; i != mt->connectivity.depth; i++)
     {
       int j;
-      for (j = 0; j != mt->connectivity.width; ++j)
+      for (j = 0; j != mt->connectivity.height; ++j)
       {
-        if (mt->connectivity.neighbors[i * mt->connectivity.width + j])
+        int k;
+        for (k = 0; k != mt->connectivity.width; ++k)
         {
-          ++num_neighbors;
+          // NOTE should it maybe be [(i * mt->connectivity.depth) * (j * mt->connectivity.height) + k]???
+          if (mt->connectivity.neighbors[(i * mt->connectivity.depth) + (j * mt->connectivity.height) + k])
+          {
+            ++num_neighbors;
+          }
         }
       }
     }
@@ -375,9 +404,10 @@ void mt_init(mt_data* mt, const image* img)
   mt_init_nodes(mt);
 
   // NOTE: needed for what? the flooding it seems, but how exactly?
-  mt->connectivity.neighbors = mt_conn_4;
-  mt->connectivity.width = MT_CONN_4_WIDTH;
-  mt->connectivity.height = MT_CONN_4_HEIGHT;
+  mt->connectivity.neighbors = mt_conn_6;
+  mt->connectivity.width = MT_CONN_6_WIDTH;
+  mt->connectivity.height = MT_CONN_6_HEIGHT;
+  mt->connectivity.depth = MT_CONN_6_DEPTH;
 
   mt->verbosity_level = 0;
 }

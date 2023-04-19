@@ -9,8 +9,8 @@
 
 /* Settings */
 
+// NOTE: not used? (done in python for 2D case)
 #define BG_REJECTION_RATE 0.05
-
 #define BG_TILE_SIZE_START 64
 #define BG_TILE_SIZE_MIN 16
 #define BG_TILE_SIZE_MAX 128

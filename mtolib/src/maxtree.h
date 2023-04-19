@@ -21,9 +21,17 @@
 #define MT_CONN_4_WIDTH 3
 #define MT_CONN_4_HEIGHT 3
 
+#define MT_CONN_6_WIDTH 3
+#define MT_CONN_6_HEIGHT 3
+#define MT_CONN_6_DEPTH 3
+
+
 extern const int mt_conn_12[MT_CONN_12_HEIGHT * MT_CONN_12_WIDTH];
 extern const int mt_conn_8[MT_CONN_8_HEIGHT * MT_CONN_8_WIDTH];
 extern const int mt_conn_4[MT_CONN_4_HEIGHT * MT_CONN_4_WIDTH];
+
+extern const int mt_conn_6[MT_CONN_6_DEPTH * MT_CONN_6_HEIGHT * MT_CONN_6_WIDTH];
+
 
 typedef struct
 {
