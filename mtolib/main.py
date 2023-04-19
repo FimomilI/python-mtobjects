@@ -24,12 +24,11 @@ def setup():
 
     img = read_fits_file(p.filename)
 
-    # TODO: check if these dimensions are correct, it should be reverse right since fits file are column major? just transpose to fix it?
     if p.verbosity:
         print("\n---Image dimensions---")
-        print("Height = ", img.shape[0])
-        print("Width = ", img.shape[1])
-        print("Depth =", img.shape[2])
+        print("Height = ", img.shape[1])
+        print("Width = ", img.shape[2])
+        print("Depth =", img.shape[0])
         print("Size = ", img.size)
 
     # Set the pixel type based on the type in the image
