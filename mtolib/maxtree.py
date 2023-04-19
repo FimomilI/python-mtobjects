@@ -50,9 +50,11 @@ class OriginalMaxTree(MaxTree):
 
 
         # Create image object
+        # NOTE: the image gets collapsed to 1D
         img_pointer = image.ravel().ctypes.data_as(ct.POINTER(params.d_type))
 
-        c_img = mt_class.Image(img_pointer, image.shape[0], image.shape[1], image.size)
+        # NOTE: is it really width, height, depth OR should it be reversed as fits files are column major? does not matter for the max-tree though?
+        c_img = mt_class.Image(img_pointer, image.shape[0], image.shape[1], image.shape[2], image.size)
 
         # Create empty mt object
         self.mt = mt_class.MtData()

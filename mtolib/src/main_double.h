@@ -33,6 +33,7 @@ typedef struct
   PIXEL_TYPE* data;
   SHORT_TYPE height;
   SHORT_TYPE width;
+  SHORT_TYPE depth;
   INT_TYPE size;
 } image;
 

@@ -9,7 +9,8 @@ def init_classes(d_type):
     pixel_type = d_type
 
     MtImageLocation._fields_ = [("x", ct.c_int16),
-                    ("y", ct.c_int16)]
+                    ("y", ct.c_int16),
+                    ("depth", ct.c_int16)]
 
     MtPixel._fields_ = [("location", MtImageLocation),
                     ("value", pixel_type)]
@@ -24,7 +25,8 @@ def init_classes(d_type):
 
     MtConnectivity._fields_ = [("neighbours", ct.POINTER(ct.c_int)),
                     ("height", ct.c_int),
-                    ("width", ct.c_int)]
+                    ("width", ct.c_int),
+                    ("depth", ct.c_int)]
 
     MtNodeAttributes._fields_ = [("volume", float_type),
                     ("power", float_type)]
@@ -35,6 +37,7 @@ def init_classes(d_type):
     Image._fields_ = [("data", ct.POINTER(pixel_type)),
                     ("height", ct.c_int16),
                     ("width", ct.c_int16),
+                    ("depth", ct.c_int16),
                     ("size", ct.c_int32)]
 
     MtData._fields_ = [("root", ct.POINTER(MtNode)),

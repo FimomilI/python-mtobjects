@@ -41,6 +41,7 @@ typedef struct
 {
   SHORT_TYPE x;
   SHORT_TYPE y;
+  SHORT_TYPE depth;
 } mt_image_location;
 
 typedef struct
