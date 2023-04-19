@@ -57,6 +57,7 @@ typedef struct
   const int* neighbors;
   int height;
   int width;
+  int depth;
 } mt_connectivity;
 
 typedef struct
