@@ -68,6 +68,7 @@ def filter_tree_timed(mt_in, image, params, sig_test=default_sig_test,
     id_pointer = object_ids.ctypes.data_as(object_id_type)
 
     # Ditto for significant ancestors
+    # NOTE: why the -3? is that the unassigned (not processed) stage?
     sig_ancs = np.zeros(image.shape, dtype=ct.c_int32) -3
     sig_anc_pointer = sig_ancs.ctypes.data_as(object_id_type)
 
@@ -86,7 +87,8 @@ def filter_tree_timed(mt_in, image, params, sig_test=default_sig_test,
                                        move_factor=params.move_factor, alpha=params.alpha,
                                        verbosity=params.verbosity, min_distance=params.min_distance)
 
-
+    # NOTE: maybe the cause of the segfault in C when I call "mto_lib.mt_objects(...)" later? it might not allocate enough memory or something for the 3D case perhaps? although it should be fine since it wasn't hardcoded for 2D from what I can tell and just depend on input image size etc.?
+    # NOTE: OR becauase it happens at the end of the function, it might be that the name of "mt_find_objects" function is overwritten on the stack (the actual stack of the c compiled program, not the one made in the code for the max-tree stuff) and therefore cannot be returned I guess, causing a segfault?
     # Create the MTO struct and a pointer
     # Avoids bizarre memory management issues - creating it in C seems to go very wrong
     mto_struct = mt_class.MtObjectData(object_ids=id_pointer, mt=ct.pointer(mt),

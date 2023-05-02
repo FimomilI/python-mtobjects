@@ -262,13 +262,14 @@ void mt_find_objects(mt_object_data* mt_o)
     printf("Found %d objects (including %d nested).\n", num_objects,
       num_objects_nested);
   }
-  
+  printf("before num_objects\n");
   mt_o->num_objects = num_objects;
+  printf("after num_objects\n");
 }
 
 void mt_main_power_branches(mt_object_data* mt_o)
 {
-  // Find the descendant of each node with the highest power
+  printf("----Find the descendant of each node with the highest power----\n");
 
   mt_data *mt = mt_o->mt;
   
@@ -305,7 +306,7 @@ void mt_main_power_branches(mt_object_data* mt_o)
 
 void mt_move_up(mt_object_data* mt_o)
 {
-  // Move object markers up the tree
+  printf("----Move object markers up the tree----\n");
 
   mt_data *mt = mt_o->mt;
 
@@ -413,6 +414,8 @@ void mt_objects(mt_object_data* mt_o)
   // Count objects
   mt_find_objects(mt_o);
 
+  printf("objects found");
+
   // If move_up is being used, find main power branches and execute move_up
   if(mt_o->paras->move_factor != 0)
   {
@@ -420,6 +423,7 @@ void mt_objects(mt_object_data* mt_o)
     mt_move_up(mt_o);
   }
 
+  printf("object IDs now");
   mt_object_ids(mt_o);
     
 }
