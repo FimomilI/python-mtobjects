@@ -89,7 +89,7 @@ def write_fits_file(data, header=None, filename='out.fits'):
 
     # Write to file
     hdulist = fits.HDUList([primary_hdu, *image_hdus])
-    hdulist.writeto(filename, clobber=True)  # Clobber deprecated for astropy 1.3
+    hdulist.writeto(filename, overwrite=True)  # Clobber deprecated for astropy 1.3
     hdulist.close()
 
 
